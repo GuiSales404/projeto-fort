@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import unicodedata
 import string
-from typing import List
 
 def is_any_csv(path: str):
     count_csv_files = 0
