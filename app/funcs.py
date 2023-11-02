@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import unicodedata
 import string
+import math
 
 def is_any_csv(path: str):
     count_csv_files = 0
@@ -22,7 +23,7 @@ def preprocess_text(text):
     
     return text
 
-def transform_note(note: str, kind: str) -> int:
+def transform_note(note: str, kind=None) -> int:
     if kind == 'to_int':
         match note:
             case 'otimo':
@@ -38,15 +39,15 @@ def transform_note(note: str, kind: str) -> int:
     else:
         match note:
             case 5:
-                return 'otimo'
+                return 'Ótimo'
             case 4:
-                return 'bom'
+                return 'Bom'
             case 3:
-                return 'regular'
+                return 'Regular'
             case 2:
-                return 'ruim'
+                return 'Ruim'
             case 1:
-                return 'pessimo'    
+                return 'Péssimo'
             
 def get_aval_data(path: str):
     
@@ -70,7 +71,8 @@ def get_aval_data(path: str):
         'metodologia': preprocess_text(df['metodologia trabalhada'].to_string(index=False)),
         'pontos_positivos': preprocess_text(df['pontos positivos'].to_string(index=False)),
         'pontos_negativos': preprocess_text(df['pontos negativos'].to_string(index=False)),
-        'sugestoes': preprocess_text(df['sugestões'].to_string(index=False))
+        'sugestoes': preprocess_text(df['sugestões'].to_string(index=False)),
+        'experiencia': preprocess_text(df['experiência'].to_string(index=False))
         })
         
     return avals
@@ -123,3 +125,31 @@ def get_all_professors(all_avals: list) -> list:
         all_professors.add(aval['professor'])
     
     return list(all_professors)
+
+def aval_note(all_avals, area, transform):
+    final_note = 0
+    for course_aval in all_avals:
+        final_note += int(course_aval[f'{area}'])
+
+    if transform == True:
+        return transform_note(math.ceil(final_note/(2*len(all_avals))))
+    if transform == False:
+        return math.ceil(final_note/(2*len(all_avals)))
+    
+def get_note_distr(all_avals, area):
+    quality = ['Ótimo', 'Bom', 'Regular', 'Ruim', 'Pessímo']
+    all_notes = []
+    data = []
+    for aval in all_avals:
+        all_notes.append(aval[f'{area}'])
+    
+    for note in quality:
+        data.append((note, all_notes.count(f'{preprocess_text(note)}')))
+    
+    return data
+
+def get_all_sugests(all_avals):
+    sugestions = []
+    for aval in all_avals:
+        sugestions.append(aval['experiencia'])
+    return sugestions
