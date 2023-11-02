@@ -3,6 +3,7 @@ import pandas as pd
 import unicodedata
 import string
 import math
+import bokeh
 
 def is_any_csv(path: str):
     count_csv_files = 0

@@ -9,7 +9,6 @@ from panel.template import FastListTemplate
 from funcs import * 
 from text_analysis import *
 hv.extension('bokeh')
-pn.extension(sizing_mode="stretch_width")
 
 all_avals = get_aval_data(selected_path)
 
@@ -81,8 +80,8 @@ def sugestion_table(all_avals):
 graphs = pn.Column(
                     '# Dashboard com Gráficos',
                     pn.Row(pn.layout.HSpacer(), pn.Column(pn.Row(pn.layout.HSpacer(), courseAval_table(all_course_notes), pn.layout.HSpacer()), courseAval_barChart(all_course_notes)),pn.layout.HSpacer()), 
-                    pn.Row(pn.Column('### Domínio do Conteúdo', area_aval_barChart('dominio_conteudo')), pn.Column('### Capacidade de Liderança', area_aval_barChart('capacidade_lideranca'))),
-                    pn.Row(pn.Column('### Clareza', area_aval_barChart('clareza')), pn.Column('### Relacionamento', area_aval_barChart('relacionamento'))),
+                    pn.Row(pn.layout.HSpacer(), pn.Column('### Domínio do Conteúdo', area_aval_barChart('dominio_conteudo')), pn.Column('### Capacidade de Liderança', area_aval_barChart('capacidade_lideranca'))),
+                    pn.Row(pn.layout.HSpacer(), pn.Column('### Clareza', area_aval_barChart('clareza')), pn.Column('### Relacionamento', area_aval_barChart('relacionamento'))),
                     pn.Row(pn.layout.HSpacer(), pn.Column('### Metodologia', area_aval_barChart('metodologia')), pn.layout.HSpacer())
                 )
 
@@ -105,4 +104,7 @@ dashboard = FastListTemplate(
     main=[tabs]
 )
 
-pn.serve(dashboard, port=8000, live=True)
+dashboard2save = pn.Column(tabs)
+dashboard2save.save(f'{selected_path}/formação_dashboard.html')
+
+pn.serve(dashboard, show=True, use_as_exporter=True, port=8000)

@@ -5,6 +5,7 @@ import panel as pn
 import nltk
 import spacy
 from nltk.corpus import stopwords
+import bokeh
 nltk.download('stopwords')
 nlp = spacy.load("pt_core_news_sm")
 
