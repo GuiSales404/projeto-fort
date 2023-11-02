@@ -7,7 +7,7 @@ from holoviews import opts
 from fort_script import selected_path
 from panel.template import FastListTemplate
 from funcs import * 
-from sentiment_analysis import analyze_sentiment
+from text_analysis import *
 hv.extension('bokeh')
 pn.extension(sizing_mode="stretch_width")
 
@@ -49,7 +49,7 @@ def area_aval_barChart(area):
                     opts.Overlay(xrotation=45)
                     )
 
-def sugestion_table(experiences):
+def experience_table(experiences):
     experiences_list = []
 
     for experience in experiences:
@@ -62,9 +62,21 @@ def sugestion_table(experiences):
     
     df = pd.DataFrame(table_exp)
     table_exp = hv.Table(df)
-    return table_exp.opts(height=90, width=800)
+    return table_exp.opts(height=90, width=1000)
 
-words = pn.Column(sugestion_table(get_all_sugests(all_avals)))
+def sugestion_table(all_avals):
+    sugestions_list = []
+
+    for aval in all_avals:
+        sugestions_list.append(aval['sugestoes'])
+
+    table_sugests = {
+    'Sugestões': sugestions_list
+    }
+    
+    df = pd.DataFrame(table_sugests)
+    table_sugests = hv.Table(df)
+    return table_sugests.opts(height=90, width=1000)
 
 graphs = pn.Column(
                     '# Dashboard com Gráficos',
@@ -74,28 +86,23 @@ graphs = pn.Column(
                     pn.Row(pn.layout.HSpacer(), pn.Column('### Metodologia', area_aval_barChart('metodologia')), pn.layout.HSpacer())
                 )
 
-wordcloud = pn.Row('Giuseppe Careta')
+words = pn.Column(
+                '# Nuvem de Palavras',
+                pn.Row(pn.Column('## Pontos Positivos',generate_wordcloud(all_avals, 'pontos_positivos')), pn.Column('## Pontos Negativos',generate_wordcloud(all_avals, 'pontos_negativos'))),
+                pn.layout.VSpacer(),
+                '# Experiências',
+                pn.Row(pn.layout.HSpacer(), experience_table(get_all_sugests(all_avals)), pn.layout.HSpacer()),
+                pn.layout.HSpacer(),
+                '# Sugestões',
+                pn.Row(pn.layout.HSpacer(), sugestion_table(all_avals), pn.layout.HSpacer())
+                )
 
 tabs = pn.Tabs(("Gráficos", graphs), ("Texto", words), ("Professores", 'professores'))
 
-# Crie um painel com os gráficos
 dashboard = FastListTemplate(
     site='Fort Dashboard',
-    title="Lista de Itens",
+    title='Avaliação de Formação',
     main=[tabs]
 )
 
 pn.serve(dashboard, port=8000, live=True)
-
-
-""" 
-Alterar plotagem dos gráficos de valores
-para nota escrita, além disso, criar gráfico
-por área de avaliação. Em casa área deve conter 
-uma coluna de cada valor de avaliação. Na plotagem
-referência o gráfico que fica do lado direito
-gráfico pizza, sera substituido pela nuvem de 
-palavras, na parte direita mantém a cidade/escola/infos.
-"""
-
-# Gráficos de avaliação, wordcloud, professor aval
